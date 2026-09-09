@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum AI</title>
+  <link rel="stylesheet" href="./src/style.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // Google Client ID for OAuth
+    window.GOOGLE_CLIENT_ID = '980881389362-p0822v4q3la7buhct55se4pa8q0m1sfi.apps.googleusercontent.com'
+  </script>
+</head>
+<body>
+
+  <!-- Glassmorphic glow orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Main App Shell -->
+  <div id="app" class="app-container">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h3>Conversations</h3>
+        <button id="new-chat-btn" class="new-chat-btn" title="Start new conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+      <div id="conversations-list" class="conversations-list">
+        <!-- Conversation items populated dynamically -->
+      </div>
+      <div class="sidebar-footer">
+        <button id="export-chat-btn" class="sidebar-action-btn" title="Export conversation">💾 Export</button>
+        <button id="clear-history-btn" class="sidebar-action-btn" title="Clear all history">🗑️ Clear</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Column -->
+    <div class="main-content">
+      <header class="header">
+        <div class="logo-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="26" stroke="white" stroke-width="2" opacity="0.5"/>
+            <circle cx="32" cy="32" r="16" stroke="white" stroke-width="2" opacity="0.7"/>
+            <circle cx="32" cy="32" r="5" fill="white"/>
+            <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(45 32 32)" opacity="0.6"/>
+            <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(-45 32 32)" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="header-info">
+          <h1>Quantum AI</h1>
+          <p id="conversation-title" class="conversation-subtitle">New Conversation</p>
+        </div>
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          Online
+        </div>
+        <button id="logout-btn" class="logout-btn" title="Logout">
+          🚪
+        </button>
+      </header>
+
+      <!-- Scrollable Chat Messages Area -->
+      <div class="chat-area" id="chat-area">
+        <div class="welcome" id="welcome">
+          <div class="welcome-logo">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="26" stroke="white" stroke-width="2" opacity="0.5"/>
+              <circle cx="32" cy="32" r="16" stroke="white" stroke-width="2" opacity="0.7"/>
+              <circle cx="32" cy="32" r="5" fill="white"/>
+              <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(45 32 32)" opacity="0.6"/>
+              <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(-45 32 32)" opacity="0.6"/>
+            </svg>
+          </div>
+          <h2>Welcome to Quantum AI</h2>
+          <p>Live web search for real-time answers — news, weather, facts, and any URL you share.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-q="Latest news on artificial intelligence">Latest AI News</button>
+            <button class="suggestion" data-q="Weather in Tokyo">Weather in Tokyo</button>
+            <button class="suggestion" data-q="What is quantum computing?">Quantum Computing</button>
+            <button class="suggestion" data-q="What can you do?">What can you do?</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Input Bar -->
+      <div class="input-section">
+        <div class="input-box">
+          <textarea id="user-input" placeholder="Message Quantum AI..." rows="1"></textarea>
+          <button class="send-btn" id="send-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="none"/>
+            </svg>
+          </button>
+        </div>
+        <p class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login & Account Creation Modal -->
+  <div id="login-modal" class="modal-overlay" style="display: none;">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="26" stroke="white" stroke-width="2" opacity="0.5"/>
+            <circle cx="32" cy="32" r="16" stroke="white" stroke-width="2" opacity="0.7"/>
+            <circle cx="32" cy="32" r="5" fill="white"/>
+            <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(45 32 32)" opacity="0.6"/>
+            <ellipse cx="32" cy="32" rx="26" ry="9" stroke="white" stroke-width="1.5" transform="rotate(-45 32 32)" opacity="0.6"/>
+          </svg>
+        </div>
+        <h1>Quantum AI</h1>
+        <p id="auth-subtitle">Sign in or create an account to start</p>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="auth-tabs" style="display: flex; border-bottom: 1px solid rgba(139,92,246,0.15); background: rgba(0,0,0,0.2);">
+        <button id="tab-signin-btn" class="auth-tab-btn active" style="flex: 1; padding: 0.8rem; background: none; border: none; color: var(--purple-light); font-weight: 600; font-size: 0.9rem; cursor: pointer; border-bottom: 2px solid var(--purple);">Sign In</button>
+        <button id="tab-signup-btn" class="auth-tab-btn" style="flex: 1; padding: 0.8rem; background: none; border: none; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; cursor: pointer;">Create Account</button>
+      </div>
+
+      <div class="login-body">
+        <div class="login-error" id="login-error" style="display: none; margin-bottom: 1rem;"></div>
+
+        <!-- Sign In Form -->
+        <form id="signin-form" class="login-form">
+          <label for="signin-email">Email Address</label>
+          <input type="email" id="signin-email" placeholder="name@example.com" required autocomplete="email" />
+          
+          <label for="signin-password">Password</label>
+          <input type="password" id="signin-password" placeholder="••••••••" required autocomplete="current-password" />
+          
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.85rem;">Sign In</button>
+        </form>
+
+        <!-- Sign Up Form (Account Creation) -->
+        <form id="signup-form" class="login-form" style="display: none;">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" placeholder="John Doe" required autocomplete="name" />
+
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" placeholder="name@example.com" required autocomplete="email" />
+          
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="At least 4 characters" minlength="4" required autocomplete="new-password" />
+          
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input type="password" id="signup-confirm-password" placeholder="Repeat password" minlength="4" required autocomplete="new-password" />
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.85rem;">Create Account</button>
+        </form>
+
+        <div style="margin: 1.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">OR</span>
+          <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+        </div>
+
+        <div id="google-signin-button" style="display: flex; justify-content: center; margin-bottom: 0.75rem;"></div>
+
+        <button id="guest-login-btn" type="button" class="btn btn-secondary" style="width: 100%; text-align: center; display: block;">⚡ Continue as Guest</button>
+
+        <div id="toggle-auth-container" style="text-align: center; margin-top: 1.2rem; font-size: 0.82rem; color: var(--text-muted);">
+          <span id="toggle-auth-prompt">Don't have an account?</span>
+          <a href="#" id="toggle-auth-link" style="color: var(--cyan-light); text-decoration: underline; margin-left: 4px; font-weight: 500;">Create Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import('./src/main.js').catch(console.error);
+  </script>
+</body>
+</html>
